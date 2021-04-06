@@ -1,0 +1,86 @@
+# Not exactly the same as SRResNet in <Photo-Realistic Single Image Super-Resolution Using a Generative Adversarial Network>
+# With 16 Residual blocks w/o BN
+
+#### general settings
+name: eegan_beijing
+use_tb_logger: false
+model: srgan
+scale: 4
+gpu_ids: [0]
+
+#### datasets
+datasets:
+  train:
+    name: beijing
+    data_type: numpy
+    mode: LQGT
+    dataroot_GT: /data/zlx/xian/experiment/sr_1120/father_x_train.npy
+    dataroot_LQ: /data/zlx/xian/experiment/sr_1120/son_x_train.npy
+
+    use_shuffle: true
+    n_workers: 1  # per GPU
+    batch_size: 8 #160
+    GT_size: 256 #96
+    use_flip: true
+    use_rot: true
+  val:
+    name: beijing2
+    mode: LQGT
+    dataroot_GT: /data/zlx/xian/experiment/sr_1120/father_x_test.npy
+    dataroot_LQ: /data/zlx/xian/experiment/sr_1120/son_x_test.npy
+
+#### network structures
+network_G:
+  which_model_G: eegan
+network_D:
+  which_model_D: discriminator_vgg_128
+  in_nc: 3
+  nf: 64
+  norm_type: batch
+  act_type: leakyrelu
+  mode: CNA
+
+#### path
+path:
+  pretrain_model_G: ~
+  strict_load: false
+  resume_state: ~
+  root: ./expx_2
+
+
+train:
+  lr_G: !!float 1e-4
+  weight_decay_G: 0
+  beta1_G: 0.9
+  beta2_G: 0.99
+  lr_D: !!float 1e-4
+  weight_decay_D: 0
+  beta1_D: 0.9
+  beta2_D: 0.99
+  lr_scheme: MultiStepLR
+
+  niter: 1000000
+  warmup_iter: -1  # no warm up
+  T_period: [250000, 250000, 250000, 250000]
+  restarts: [250000, 500000, 750000]
+  restart_weights: [1, 1, 1]
+  eta_min: !!float 1e-7
+  lr_gamma: 0.5
+
+  pixel_criterion: l1
+  pixel_weight: !!float 1e-2
+  feature_criterion: l1
+  feature_weight: 1
+  gan_type: gan  # gan | ragan
+  gan_weight: !!float 5e-3
+
+  D_update_ratio: 1
+  D_init_iters: 0
+
+  manual_seed: 10
+  val_freq: !!float 5e3
+
+#### logger
+logger:
+  print_freq: 100
+  save_checkpoint_freq: !!float 5e3
