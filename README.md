@@ -1,4 +1,4 @@
 # SRBuildSeg
-PyTorch implementation of SRBuildSeg: a deep learning approach for super-resolution building extraction
+PyTorch implementation of the paper entitled the paper entitled “Making low-resolution satellite images reborn: a deep learning approach for super-resolution building extraction”. 
 
-Code is coming soon
+Our paper is under checking for pre-print, detailed description is coming soon
